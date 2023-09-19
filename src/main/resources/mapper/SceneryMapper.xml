@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gsd.dao.SceneryDao">
+<!--  1.多表映射  -->
+<!--  resultType是自动映射,也就是根据字段去找各个属性的setter方法,但是没有另一张表的 scetype.setScetypeid()方法  -->
+<!--  所以要使用手动映射  -->
+    <!--  所以要使用手动映射(优先级高),autoMapping="true"(默认),表示Scenery本身是自动映射,而关联的字段需要手动映射  -->
+<!--    <resultMap id="sceneryMap" type="com.gsd.entity.Scenery" autoMapping="true">-->
+<!--        &lt;!&ndash;    property是Set方法,主键一定要用id,普通字段使用result    &ndash;&gt;-->
+<!--        &lt;!&ndash;        <id property="sceid" column="sceid"/>&ndash;&gt;-->
+<!--        &lt;!&ndash;        <result property="scetypeid" column="scetypeid"/>&ndash;&gt;-->
+<!--        &lt;!&ndash;    关联字段使用手动映射,多对一assoation,一对多collection,其实可以混用    &ndash;&gt;-->
+
+<!--        <association property="scetype">&lt;!&ndash; 聚合属性 &ndash;&gt;-->
+<!--            <id property="scetypeid" column="scetypeid"/>-->
+<!--            <result property="scename" column="name"/>&lt;!&ndash; 注意这里有同名字段的时候,会优先用前一个,因此设置别名,使名字唯一,这也是column的作用 &ndash;&gt;-->
+<!--        </association>-->
+<!--    </resultMap>-->
+
+<!--    <select id="findAll" resultMap="sceneryMap"> &lt;!&ndash;   resultType="com.gsd.entity.Scenery     &ndash;&gt;-->
+<!--        select sceid,t_scenery.scename,t_scenery.scetypeid,context,pic,recommend,areaid,ticket,favorite,season,collection,sce_grade,location,start_time,tic_count,t_scetype.scename name-->
+<!--        from t_scenery-->
+<!--        LEFT JOIN t_scetype-->
+<!--        ON t_scenery.scetypeid = t_scetype.scetypeid;-->
+<!--    </select>-->
+
+<!--  3.sql代码片段,把一段sql定义成一个变量  -->
+    <sql id="baseScenery">
+        sceid,scename,scetypeid,context,pic,recommend,areaid,ticket,favorite,season,collection,sce_grade,location,start_time,tic_count
+    </sql>
+<!--  4.在Beans里面配置类的别名 typeAliase-->
+
+<!--  2.推荐使用方法2,先查主表,再查子表  -->
+
+    <!-- A.查景点主表和Type名称 -->
+    <!--  查主表  -->
+    <select id="findAll" resultMap="sceneryMap">
+        select sceid,scename,scetypeid,context,pic,recommend,areaid,ticket,favorite,season,collection,sce_grade,location,start_time,tic_count
+        from t_scenery
+        <!--   where 1=1 -->
+        <!--   动态sql<where>标签 如果没有条件，就不生成where，有的话生成where并删除where中第一个AND -->
+        <where>
+            <!--
+            #{} == PreparedStatement 接口，先生成 ？ 再替换，可以防止SQL注入，但是在like引号里面有别成'%?%'的问题
+            ${} == Statement 接口 直接拼接
+            -->
+            <if test="scename!=null and scename!=''">
+                <!--scename like '%#{scename}%',当心识别成'%?%'-->
+                AND scename like '%${scename}%'
+            </if>
+
+            <if test="scetypeid!=null and scetypeid!=0">
+                AND scetypeid = #{scetypeid}
+            </if>
+            <!--    区域,子表-->
+            <if test="areaid!=null and areaid!=0">
+                AND areaid = #{areaid}
+            </if>
+            <!--    票价，对象属性外的值,往entity里加两个属性或者创建一个新的VO类去继承entity    -->
+            <if test="lowprice!= null and highprice!= null">
+                AND ticket BETWEEN #{lowprice} AND #{highprice}
+            </if>
+            <!--       季节   -->
+            <if test="season!=null and season!=''">
+                AND season = #{season}
+            </if>
+            <!--      地点         -->
+            <if test="location!=null and location!=''">
+                AND location like '%${location}%'
+            </if>
+        </where>
+        order by sceid desc
+    </select>
+
+    <!--  可以看一下log里面打印的语句,执行主表后,根据column="scetypeid", 传给select="findScetypeBytypeId"当参数  -->
+    <!--  fetchType="lazy"(延迟加载)仅当调用从表的属性时才会查询从表,默认是eager(即时加载,总是查子表),这个属性可以全局配置,注意这个设置会导致一级缓存失效  -->
+    <resultMap id="sceneryMap" type="com.gsd.entity.Scenery">
+        <!--    子表1    -->
+        <association property="scetype" select="com.gsd.dao.ScetypeDao.findScetypeBytypeId" column="scetypeid"><!-- fetchType="lazy" 在Bean里配置好了  -->
+            <id property="scetypeid" column="scetypeid"/>   <!--   select="findScetypeBytypeId"    -->
+            <result property="scename" column="scename"/>
+        </association>
+
+        <!--    子表2    -->
+        <association property="area" select="com.gsd.dao.AreaDao.findAreaByareaId" column="areaid">
+            <id property="areaid" column="areaid"/>
+            <result property="areaname" column="areaname"/>
+        </association>
+    </resultMap>
+
+    <!--  查子表,注意应该放在子表的mapper里面 ,放到另一个文件后,应该注明新的文件的namespace -->
+    <!--  parameterType="int",表示传进来的#{scetypeid}的参数类型  -->
+    <!--    <select id="findScetypeBytypeId" resultType="com.gsd.entity.Scetype" parameterType="int" >-->
+    <!--        select scetypeid, scename from t_scetype WHERE scetypeid = #{scetypeid}-->
+    <!--    </select>-->
+
+
+    <!--  B. 查询所有type和对应的景点,子表    -->
+    <select id="findSceneryBytypeid" resultType="com.gsd.entity.Scenery">
+        select sceid,scename,scetypeid,context,pic,recommend,areaid,ticket,favorite,season,collection,sce_grade,location,start_time,tic_count
+        from t_scenery
+        WHERE scetypeid = #{scetypeid}
+    </select>
+
+    <!--  季节列表  -->
+    <select id="findAllSeason" resultType="com.gsd.entity.Scenery">
+        select DISTINCT season
+        from t_scenery
+        WHERE season IS NOT NULL
+    </select>
+
+    <!--  添加景点  打开表格,切换成insert,复制粘贴-->
+    <insert id="addScenery">
+        INSERT INTO travle.t_scenery (sceid, scename, scetypeid, context,pic, areaid, ticket, season, sce_grade, location, start_time, tic_count)
+        VALUES (0, #{scename}, #{scetypeid}, #{context},#{pic}, #{areaid}, #{ticket}, #{season}, #{sceGrade}, #{location}, #{startTime}, #{ticCount});
+    </insert>
+
+    <!--  修改景点  -->
+    <update id="updateScenery">
+        UPDATE travle.t_scenery SET scename = #{scename}, scetypeid = #{scetypeid}, context = #{context},
+        pic = #{pic}, recommend = #{recommend}, areaid = #{areaid}, ticket = #{ticket}, favorite = #{favorite},
+        season = #{season}, collection = #{collection}, sce_grade = #{sceGrade}, location = #{location},
+        start_time = #{startTime}, tic_count = #{ticCount}
+        WHERE sceid = #{sceid};
+    </update>
+
+    <!--  选择性添加景点 -->
+    <insert id="addScenerySelective">
+        INSERT INTO travle.t_scenery
+        <trim suffixOverrides="," prefix="(" suffix=")">
+            sceid,
+            <if test="scename!=null and scename!=''">
+                scename,
+            </if>
+            <if test="scetypeid!= null and scetypeid!=0">
+                scetypeid,
+            </if>
+            <if test="context!=null and context!=''">
+                context,
+            </if>
+            <if test="pic!=null and pic!=''">
+                pic,
+            </if>
+            <if test="areaid!= null and areaid!=0">
+                areaid,
+            </if>
+            <if test="ticket!= null">
+                ticket,
+            </if>
+            <if test="season!=null and season!=''">
+                season,
+            </if>
+            <if test="sceGrade!=null and sceGrade!=''"><!--里面是get方法-->
+                sce_grade,
+            </if>
+            <if test="location!=null and location!=''">
+                location,
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                start_time,
+            </if>
+            <if test="ticCount!= null">
+                tic_count,
+            </if>
+        </trim>
+
+        <trim suffixOverrides="," prefix="VALUES (" suffix=")">
+            0,
+            <if test="scename!=null and scename!=''">
+                #{scename},
+            </if>
+            <if test="scetypeid!= null and scetypeid!=0">
+                #{scetypeid},
+            </if>
+            <if test="context!=null and context!=''">
+                #{context},
+            </if>
+            <if test="pic!=null and pic!=''">
+                #{pic},
+            </if>
+            <if test="areaid!= null and areaid!=0">
+                #{areaid},
+            </if>
+            <if test="ticket!= null">
+                #{ticket},
+            </if>
+            <if test="season!=null and season!=''">
+                #{season},
+            </if>
+            <if test="sceGrade!=null and sceGrade!=''"><!--里面是get方法-->
+                #{sceGrade},
+            </if>
+            <if test="location!=null and location!=''">
+                #{location},
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                #{startTime},
+            </if>
+            <if test="ticCount!= null">
+                #{ticCount},
+            </if>
+        </trim>
+    </insert>
+
+    <!--  根据sceid选择  -->
+    <!--  B. 查询所有type和对应的景点,子表    -->
+    <!--  sql代码片段,使用例  -->
+    <select id="findSceneryBysceid" resultType="Scenery">
+        select <include refid="baseScenery"/>
+        from t_scenery
+        WHERE sceid = #{sceid}
+    </select>
+
+    <!-- 选择性修改景点 ,动态sql的<set>可以自动去掉内部最后一个逗号-->
+    <update id="updateScenerySelective">
+        UPDATE travle.t_scenery
+        <set>
+            <if test="scename!=null and scename!=''">
+                scename = #{scename},
+            </if>
+            <if test="scetypeid!=null and scetypeid!=0">
+                scetypeid = #{scetypeid},
+            </if>
+            <if test="context!=null and context!=''">
+                context = #{context},
+            </if>
+            <if test="pic!=null and pic!=''">
+                pic = #{pic},
+            </if>
+            <if test="recommend!=null">
+                recommend = #{recommend},
+            </if>
+            <if test="areaid!=null and areaid!=0">
+                areaid = #{areaid},
+            </if>
+            <if test="ticket!=null">
+                ticket = #{ticket},
+            </if>
+            <if test="favorite!=null">
+                favorite = #{favorite},
+            </if>
+            <if test="season!=null and season!=''">
+                season = #{season},
+            </if>
+            <if test="collection!=null">
+                collection = #{collection},
+            </if>
+            <if test="sceGrade!=null and sceGrade!=''">
+                sce_grade = #{sceGrade},
+            </if>
+            <if test="location!=null and location!=''">
+                location = #{location},
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                start_time = #{startTime},
+            </if>
+            <if test="ticCount!=null"><!--最后一个项目后面也一定要带逗号-->
+                tic_count = #{ticCount},
+            </if>
+        </set>
+        WHERE sceid = #{sceid};
+    </update>
+
+    <!--  删除  -->
+    <delete id="deleteById">
+        DELETE FROM t_scenery WHERE sceid = #{sceid}
+    </delete>
+
+    <!--  批量删除  -->
+    <!--  collection表示遍历的的对象,可以是数组和List
+    数组就写array,如果是List就写list
+    open遍历前添加内容
+    close遍历后添加内容
+    item:遍历项
+    separator:分隔符号,最后一个不加分隔符号
+      -->
+    <delete id="batchDelete">
+        <foreach collection="array" open="DELETE FROM t_scenery  WHERE sceid IN (" close=")" item="sceid" separator=",">
+            ${sceid}
+        </foreach>
+    </delete>
+
+</mapper>

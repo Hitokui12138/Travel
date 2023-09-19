@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://mybatis.org/schema/mybatis-spring
+       http://mybatis.org/schema/mybatis-spring.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:component-scan base-package="com.gsd">
+        <!--    父容器不要扫描含有controller注解的    -->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+    <!--  mybaitsi 让Spring负责创建，关闭连接  -->
+    <!--  创建SQLfactory,像这种第三方的，ID不能随便起，必须是去掉Bean的部分  -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--    1.数据源（DataSource接口），可以用druid或者spring自带的数据源    -->
+        <property name="dataSource" ref="dataSource" />
+        <!--    2.Mapper文件    -->
+        <property name="mapperLocations" value="classpath*:mapper/*.xml" />
+        <!--   3.设置驼峰命名转换     -->
+        <!--   这个要看一下sqlSessionFactory类,根据设置mapUnderscoreToCamelCase的setter方法来写     -->
+        <property name="configuration">
+            <bean class="org.apache.ibatis.session.Configuration">
+                <property name="mapUnderscoreToCamelCase" value="true"/>
+<!--                <property name="lazyLoadingEnabled" value="true"/>  &lt;!&ndash;    开启延迟加载    &ndash;&gt;-->
+<!--            <property name="aggressiveLazyLoading" value="false"/> &lt;!&ndash;    练一下    &ndash;&gt;-->
+            </bean>
+        </property>
+
+        <!--   4.分页查询插件     -->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <props>
+                            <prop key="pageSizeZero">true</prop>    <!-- 只是个实例 -->
+                        </props>
+                    </property>
+                </bean>
+            </array>
+        </property>
+
+        <!--    5.mapper 文件class的别名    -->
+        <!--    com.gsd.entity.Scenery ->  Scenery   -->
+        <property name="typeAliasesPackage" value="com.gsd.entity"/>
+
+    </bean>
+
+
+    <bean id="dataSource"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/travle?serverTimezone=GMT&amp;useSSL=false"/>
+        <property name="username" value="root"/>
+        <property name="password" value="admin"/>
+    </bean>
+
+    <!--  现在还缺一个sqlMapper，由于是Spring托管的，现在不能随便拿到了  -->
+    <!--  扫描该包下的接口，生成`代理对象` -->
+<!--    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">-->
+<!--        <property name="basePackage" value="com.gsd.dao"/>-->
+<!--    </bean>-->
+
+<!--  mybatis-config没用了  -->
+<!--  官方推荐使用这个标签  -->
+    <mybatis-spring:scan base-package="com.gsd.dao"/>
+<!--    -->
+
+<!--  配置事务管理器,需要一个数据源,相当于切面类  -->
+<!--  然后需要类似切面表达式的东西,可以使用配置文件或者注解  -->
+<!--  标注需要生成代理对象的类  -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+<!--  开启事务注解功能,可以自动扫描@transact注解,两者结合是织入的过程  -->
+<!--  spring替代了Service  -->
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+
+
+</beans>

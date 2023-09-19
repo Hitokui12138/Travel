@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gsd.dao.RoomTypeDao">
+    <select id="findRoomTypeById" resultType="com.gsd.entity.RoomType">
+        SELECT roomtypeid,roomtype,roomprice,roomnum,acquiescence,hotelid,roomsize,intime,outtime
+        FROM t_roomtype
+        WHERE roomtypeid = #{roomtypeid}
+    </select>
+
+    <select id="findAll" resultType="com.gsd.entity.RoomType">
+        SELECT roomtypeid,roomtype,roomprice,roomnum,acquiescence,hotelid,roomsize,intime,outtime
+        FROM t_roomtype
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.gsd.entity.Hotel">
+        UPDATE travle.t_roomtype SET roomtypeid=#{roomtypeid},roomprice=#{roomprice},roomnum = #{roomnum},intime=#{intime},outtime=#{outtime}  WHERE roomtypeid = #{roomtypeid};
+    </update>
+</mapper>

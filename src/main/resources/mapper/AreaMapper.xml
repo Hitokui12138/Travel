@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--可以理解成一个类,这个就是包名和类名-->
+<mapper namespace="com.gsd.dao.AreaDao">
+    <select id="findAreaByareaId" resultType="com.gsd.entity.Area" parameterType="int">
+        SELECT areaid, areaname from t_area WHERE areaid = #{areaid}
+    </select>
+
+    <select id="findAll" resultType="com.gsd.entity.Area">
+        SELECT areaid, areaname from t_area
+    </select>
+</mapper>

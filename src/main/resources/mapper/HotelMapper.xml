@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gsd.dao.HotelDao">
+    <select id="findAll" resultMap="HotelMap">
+        SELECT hotelid,hotelname,in_time,out_time,pic,hotelareaid,roomtypeid,context,collection,favorite,room_count,site,hotelphone,price
+        FROM t_hotel
+        <where>
+            <!--     酒店名称       -->
+            <if test="hotelname!=null and hotelname!=''">
+                <!--scename like '%#{scename}%',当心识别成'%?%'-->
+                AND hotelname like '%${hotelname}%'
+            </if>
+            <!--     酒店位置       -->
+            <if test="hotelareaid!=null and hotelareaid!=0">
+                AND hotelareaid = #{hotelareaid}
+            </if>
+            <!--     房间类型       -->
+            <if test="roomtypeid!=null and roomtypeid!=0">
+                AND roomtypeid = #{roomtypeid}
+            </if>
+        </where>
+        ORDER BY hotelid DESC
+    </select>
+
+    <resultMap id="HotelMap" type="com.gsd.entity.Hotel">
+        <!--   hotelarea 自动映射     -->
+        <association property="hotelarea" select="com.gsd.dao.HotelAreaDao.findHotelAreaById" column="hotelareaid"/>
+        <!--    roomtype    -->
+        <association property="roomtype" select="com.gsd.dao.RoomTypeDao.findRoomTypeById" column="roomtypeid"/>
+    </resultMap>
+
+    <!--  添加  -->
+    <insert id="addHotel">
+        INSERT INTO travle.t_hotel (hotelid, hotelname, in_time, out_time, pic, hotelareaid, roomtypeid, context, room_count, site, hotelphone, price)
+        VALUES (0, #{hotelname}, #{intime}, #{outtime}, #{pic}, #{hotelareaid}, #{roomtypeid}, #{context}, #{roomcount}, #{site}, #{hotelphone}, #{price});
+    </insert>
+
+
+<!--  新的  -->
+    <resultMap id="BaseResultMap" type="com.gsd.entity.Hotel">
+        <id column="hotelid" jdbcType="INTEGER" property="hotelid" />
+        <result column="hotelname" jdbcType="VARCHAR" property="hotelname" />
+        <result column="in_time" jdbcType="VARCHAR" property="intime" />
+        <result column="out_time" jdbcType="VARCHAR" property="outtime" />
+        <result column="pic" jdbcType="VARCHAR" property="pic" />
+        <result column="hotelareaid" jdbcType="INTEGER" property="hotelareaid" />
+        <result column="roomtypeid" jdbcType="INTEGER" property="roomtypeid" />
+        <result column="context" jdbcType="VARCHAR" property="context" />
+        <result column="collection" jdbcType="INTEGER" property="collection" />
+        <result column="favorite" jdbcType="INTEGER" property="favorite" />
+        <result column="room_count" jdbcType="INTEGER" property="roomcount" />
+        <result column="site" jdbcType="VARCHAR" property="site" />
+        <result column="hotelphone" jdbcType="BIGINT" property="hotelphone" />
+        <result column="price" jdbcType="INTEGER" property="price" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        hotelid, hotelname, in_time, out_time, pic, hotelareaid, roomtypeid, context, `collection`,
+        favorite, room_count, site, hotelphone, price
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_hotel
+        where hotelid = #{hotelid,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from t_hotel
+        where hotelid = #{hotelid,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" keyColumn="hotelid" keyProperty="hotelid" parameterType="com.gsd.entity.Hotel" useGeneratedKeys="true">
+        insert into t_hotel (hotelname, in_time, out_time,
+        pic, hotelareaid, roomtypeid,
+        context, `collection`, favorite,
+        room_count, site, hotelphone,
+        price)
+        values (#{hotelname,jdbcType=VARCHAR}, #{inTime,jdbcType=VARCHAR}, #{outTime,jdbcType=VARCHAR},
+        #{pic,jdbcType=VARCHAR}, #{hotelareaid,jdbcType=INTEGER}, #{roomtypeid,jdbcType=INTEGER},
+        #{context,jdbcType=VARCHAR}, #{collection,jdbcType=INTEGER}, #{favorite,jdbcType=INTEGER},
+        #{roomCount,jdbcType=INTEGER}, #{site,jdbcType=VARCHAR}, #{hotelphone,jdbcType=BIGINT},
+        #{price,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" keyColumn="hotelid" keyProperty="hotelid" parameterType="com.gsd.entity.Hotel" useGeneratedKeys="true">
+        insert into t_hotel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="hotelname != null">
+                hotelname,
+            </if>
+            <if test="inTime != null">
+                in_time,
+            </if>
+            <if test="outTime != null">
+                out_time,
+            </if>
+            <if test="pic != null">
+                pic,
+            </if>
+            <if test="hotelareaid != null">
+                hotelareaid,
+            </if>
+            <if test="roomtypeid != null">
+                roomtypeid,
+            </if>
+            <if test="context != null">
+                context,
+            </if>
+            <if test="collection != null">
+                `collection`,
+            </if>
+            <if test="favorite != null">
+                favorite,
+            </if>
+            <if test="roomCount != null">
+                room_count,
+            </if>
+            <if test="site != null">
+                site,
+            </if>
+            <if test="hotelphone != null">
+                hotelphone,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="hotelname != null">
+                #{hotelname,jdbcType=VARCHAR},
+            </if>
+            <if test="inTime != null">
+                #{inTime,jdbcType=VARCHAR},
+            </if>
+            <if test="outTime != null">
+                #{outTime,jdbcType=VARCHAR},
+            </if>
+            <if test="pic != null">
+                #{pic,jdbcType=VARCHAR},
+            </if>
+            <if test="hotelareaid != null">
+                #{hotelareaid,jdbcType=INTEGER},
+            </if>
+            <if test="roomtypeid != null">
+                #{roomtypeid,jdbcType=INTEGER},
+            </if>
+            <if test="context != null">
+                #{context,jdbcType=VARCHAR},
+            </if>
+            <if test="collection != null">
+                #{collection,jdbcType=INTEGER},
+            </if>
+            <if test="favorite != null">
+                #{favorite,jdbcType=INTEGER},
+            </if>
+            <if test="roomCount != null">
+                #{roomCount,jdbcType=INTEGER},
+            </if>
+            <if test="site != null">
+                #{site,jdbcType=VARCHAR},
+            </if>
+            <if test="hotelphone != null">
+                #{hotelphone,jdbcType=BIGINT},
+            </if>
+            <if test="price != null">
+                #{price,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.gsd.entity.Hotel">
+        update t_hotel
+        <set>
+            <if test="hotelname != null">
+                hotelname = #{hotelname,jdbcType=VARCHAR},
+            </if>
+            <if test="intime != null">
+                in_time = #{intime,jdbcType=VARCHAR},
+            </if>
+            <if test="outtime != null">
+                out_time = #{outtime,jdbcType=VARCHAR},
+            </if>
+            <if test="pic != null">
+                pic = #{pic,jdbcType=VARCHAR},
+            </if>
+            <if test="hotelareaid != null">
+                hotelareaid = #{hotelareaid,jdbcType=INTEGER},
+            </if>
+            <if test="roomtypeid != null">
+                roomtypeid = #{roomtypeid,jdbcType=INTEGER},
+            </if>
+            <if test="context != null">
+                context = #{context,jdbcType=VARCHAR},
+            </if>
+            <if test="collection != null">
+                `collection` = #{collection,jdbcType=INTEGER},
+            </if>
+            <if test="favorite != null">
+                favorite = #{favorite,jdbcType=INTEGER},
+            </if>
+            <if test="roomcount != null">
+                room_count = #{roomcount,jdbcType=INTEGER},
+            </if>
+            <if test="site != null">
+                site = #{site,jdbcType=VARCHAR},
+            </if>
+            <if test="hotelphone != null">
+                hotelphone = #{hotelphone,jdbcType=BIGINT},
+            </if>
+            <if test="price != null">
+                price = #{price,jdbcType=INTEGER},
+            </if>
+        </set>
+        where hotelid = #{hotelid,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.gsd.entity.Hotel">
+        update t_hotel
+        set hotelname = #{hotelname,jdbcType=VARCHAR},
+        in_time = #{inTime,jdbcType=VARCHAR},
+        out_time = #{outTime,jdbcType=VARCHAR},
+        pic = #{pic,jdbcType=VARCHAR},
+        hotelareaid = #{hotelareaid,jdbcType=INTEGER},
+        roomtypeid = #{roomtypeid,jdbcType=INTEGER},
+        context = #{context,jdbcType=VARCHAR},
+        `collection` = #{collection,jdbcType=INTEGER},
+        favorite = #{favorite,jdbcType=INTEGER},
+        room_count = #{roomCount,jdbcType=INTEGER},
+        site = #{site,jdbcType=VARCHAR},
+        hotelphone = #{hotelphone,jdbcType=BIGINT},
+        price = #{price,jdbcType=INTEGER}
+        where hotelid = #{hotelid,jdbcType=INTEGER}
+    </update>
+</mapper>

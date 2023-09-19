@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--可以理解成一个类,这个就是包名和类名-->
+<mapper namespace="com.gsd.dao.ScetypeDao">
+    <!-- A.查景点主表和Type名称,子表 -->
+    <!--  如果只是在mapper里面用的话,可以不写interface的方法  -->
+    <select id="findScetypeBytypeId" resultType="com.gsd.entity.Scetype" parameterType="int" >
+        select scetypeid, scename from t_scetype WHERE scetypeid = #{scetypeid}
+    </select>
+
+
+    <!--  B. 查询所有type和对应的景点    -->
+    <select id="findAll" resultMap="ScetypeMap" >
+        select scetypeid, scename from t_scetype;
+    </select>
+
+    <resultMap id="ScetypeMap" type="com.gsd.entity.Scetype">
+        <!--    id为null时的处理    -->
+        <id property="scetypeid" column="scetypeid"/>
+        <result property="scename" column="scename"/>
+        <!--    聚合属性sceneries是Type里定义的景点列表List<Scenery>    -->
+        <association property="sceneries" select="com.gsd.dao.SceneryDao.findSceneryBytypeid" column="scetypeid">
+            <!--      可以自动映射      -->
+        </association>
+    </resultMap>
+
+
+    <!--  C. 查询单个type和对应的景点,resultMap还是用上面那个  -->
+    <select id="findOne" resultMap="ScetypeMap" >
+        select scetypeid, scename from t_scetype where scetypeid = #{scetypeid}
+    </select>
+</mapper>

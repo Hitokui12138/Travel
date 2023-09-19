@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>基于Bootstrap可编辑的HTML表格jquery插件</title>
+	<link rel="stylesheet" href="https://www.jq22.com/jquery/bootstrap-3.3.4.css">
+	<link rel="stylesheet" href="https://www.jq22.com/jquery/font-awesome.4.7.0.css">
+	<style type="text/css">
+	.box {
+		width: 20px;
+		height: 20px;
+		padding: 2px;
+		border: 1px solid #ccc;
+		border-radius: 2px;
+	}
+	.hide{
+		display:none;
+	}
+</style>
+	</head>
+	<body>
+<h1 style="text-align: center">基于Bootstrap可编辑的HTML表格jquery插件</h1>
+<div class="container">
+      <div class="row">
+		<div class="col-md-12" style="padding:2em 0;">
+			<p>点击 <i class="fa fa-pencil box"></i> 按钮可以对表格进行编辑，点击 <i class="fa fa-trash-o box"></i>按钮可以将该表格行删除。</p>
+			<div class="table-responsive">
+				<table class="table table-bordered table-striped" id="mytable" columnsEd="" addButton="add">
+					<thead>
+						<tr>
+						<th class="hide">ID</th>
+						<th>姓名</th>
+						<th>年龄</th>
+						<th>email</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+						<td class="hide">id</td>
+						<td>张三</td>
+						<td>25</td>
+						<td>zs@163.com</td>
+						</tr>
+						<tr>
+						<td class="hide">id</td>
+						<td>李四</td>
+						<td>23</td>
+						<td>lisi@qq.com</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+        </div>
+		<div class="col-md-12"  style="padding-bottom:2em;">
+			<button class="btn btn-info" id="add"><i class="fa fa-plus"></i> 添加新的表格行</button>
+        </div>
+	</div>
+	
+	<div class="row">
+		<div class="col-md-12" style="padding:2em 0;">
+			<p>点击 <i class="fa fa-pencil box"></i> 按钮可以对表格进行编辑，点击 <i class="fa fa-trash-o box"></i>按钮可以将该表格行删除。</p>
+			<div class="table-responsive">
+				<table class="table table-bordered table-striped" id="mytable2" columnsEd="0,1," addButton="add2">
+					<thead>
+						<tr>
+						<th class="hide">ID</th>
+						<td>姓名</td>
+						<td>年龄</td>
+						<td>email</td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+						<td class="hide">id</td>
+						<td>张三</td>
+						<td>25</td>
+						<td>zs@163.com</td>
+						</tr>
+						<tr>
+						<td class="hide">id</td>
+						<td>李四</td>
+						<td>23</td>
+						<td>lisi@qq.com</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+        </div>
+		<div class="col-md-12"  style="padding-bottom:2em;">
+			<button class="btn btn-info" id="add2"><i class="fa fa-plus"></i> 添加新的表格行</button>
+        </div>
+	</div>
+	
+</div>
+<!--<script src="https://www.jq22.com/jquery/jquery-1.10.2.js"></script>-->
+<script src="js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="js/bootstable.js"></script> 
+<script type="text/javascript">
+	var table = SetEditable({
+		tabedId:'mytable,mytable2',
+		onEdit: function(row,values,tableid) {
+			//编辑后回调
+			console.log(row);
+			console.log(values);
+			console.log(tableid);
+			
+			
+			$.ajax({
+				type: "post",
+				url: "",
+				data: values,
+				async: false,
+				success: function (res) {
+				
+					//编辑后可以给第一个单元格id设置默认值
+					row.children('td').eq(0).text(res.id);
+				}
+			});
+		},
+		onBeforeDelete: function(row,values,tableid) {
+			//删除前回调
+			console.log(row);
+			console.log(values);
+			console.log(tableid);
+			
+			//获取第一个单元格隐藏的id
+			console.log(row.children('td').eq(0).text());
+		},
+		onDelete: function(tableid) {
+			//删除后回调
+			console.log(tableid);
+		},
+		onAdd: function(tableid) {
+			//添加表格后回调
+			console.log(tableid);
+		}
+	});
+</script>
+</body>
+</html>

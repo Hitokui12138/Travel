@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gsd.dao.HotelAreaDao">
+    <select id="findHotelAreaById" resultType="com.gsd.entity.HotelArea">
+        SELECT hotelareaid, areaname FROM t_hotelarea WHERE hotelareaid = #{hotelareaid}
+    </select>
+
+    <select id="findAll" resultType="com.gsd.entity.HotelArea">
+        SELECT hotelareaid, areaname FROM t_hotelarea
+    </select>
+</mapper>

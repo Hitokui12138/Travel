@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gsd.dao.ExceptionsDao">
+  <resultMap id="BaseResultMap" type="com.gsd.entity.Exceptions">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="methodName" jdbcType="VARCHAR" property="methodname" />
+    <result column="methodType" jdbcType="VARCHAR" property="methodtype" />
+    <result column="requestType" jdbcType="VARCHAR" property="requesttype" />
+    <result column="ip" jdbcType="VARCHAR" property="ip" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, methodName, methodType, requestType, ip, url
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from exception
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from exception
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.gsd.entity.Exceptions" useGeneratedKeys="true">
+    insert into exception (methodName, methodType, requestType, 
+      ip, url)
+    values (#{methodname,jdbcType=VARCHAR}, #{methodtype,jdbcType=VARCHAR}, #{requesttype,jdbcType=VARCHAR}, 
+      #{ip,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.gsd.entity.Exceptions" useGeneratedKeys="true">
+    insert into exception
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="methodname != null">
+        methodName,
+      </if>
+      <if test="methodtype != null">
+        methodType,
+      </if>
+      <if test="requesttype != null">
+        requestType,
+      </if>
+      <if test="ip != null">
+        ip,
+      </if>
+      <if test="url != null">
+        url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="methodname != null">
+        #{methodname,jdbcType=VARCHAR},
+      </if>
+      <if test="methodtype != null">
+        #{methodtype,jdbcType=VARCHAR},
+      </if>
+      <if test="requesttype != null">
+        #{requesttype,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null">
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        #{url,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.gsd.entity.Exceptions">
+    update exception
+    <set>
+      <if test="methodname != null">
+        methodName = #{methodname,jdbcType=VARCHAR},
+      </if>
+      <if test="methodtype != null">
+        methodType = #{methodtype,jdbcType=VARCHAR},
+      </if>
+      <if test="requesttype != null">
+        requestType = #{requesttype,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null">
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.gsd.entity.Exceptions">
+    update exception
+    set methodName = #{methodname,jdbcType=VARCHAR},
+      methodType = #{methodtype,jdbcType=VARCHAR},
+      requestType = #{requesttype,jdbcType=VARCHAR},
+      ip = #{ip,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

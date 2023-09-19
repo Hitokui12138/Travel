@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:component-scan base-package="com.gsd">
+        <!--    子容器只扫描含有controller注解的    -->
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <!-- 为了OperateLog, 再扫描两个注解 -->
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+        <context:include-filter type="annotation" expression="org.aspectj.lang.annotation.Aspect"/>
+    </context:component-scan>
+    <!--
+    选带mvc的那个处理器映射器
+    它会使用最新的处理器映射器,处理器适配器,开启5个转换器(包括日期)
+      -->
+    <mvc:annotation-driven/>
+    <!--  视图解析器  -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+<!--  静态文件会被SpringMVC拦截,而SpringMVC只会去找Controller,这导致不生效 -->
+    <!--  1.放行bootstrap静态文件,可以一个个单独设置,不过不推荐这种方法 -->
+<!--    <mvc:resources  location="/bootstrap/css/" mapping="/bootstrap/css/**"/>-->
+
+    <!--  2.如果没有对应的controller(找不到bootStrap的映射),就尝试使用默认的servlet去处理  -->
+    <!--  静态文件本质上是DefaultServlet读入再写进响应头报文里  -->
+    <mvc:default-servlet-handler/>
+
+<!--  1,配置文件上传解析器,2.还需要两个包,导一个就行  -->
+    <!-- 配置文件解析器对象，要求id名称必须是multipartResolver -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="10485760"/>
+    </bean>
+
+
+    <!--  开启aop注解扫描 扫面logAspecter  -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+<!--  配置的拦截器只拦截Controller,拦截器与过滤器的区别？但是不拦截JSP  -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!--     一个*表示当前目录。，两个*表示当前目录和子目录 -->
+<!--            <mvc:mapping path="/**"/>--><!-- 这样会拦截到静态资源的 -->
+            <mvc:mapping path="/scenery/**"/>
+            <mvc:mapping path="/hotel/**"/>
+            <mvc:mapping path="/roomtype/**"/>
+            <bean class="com.gsd.interceptor.LoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+</beans>

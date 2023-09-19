@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gsd.dao.EmpDao">
+<!--  相当于新建了一个addEmp方法  -->
+<!--    <insert id="addEmp">-->
+<!--        INSERT INTO `myschool`.`emp` (`empno`, `ename`, `job`, `mgr`, `hiredate`, `sal`, `comm`, `deptno`, `status`) VALUES (8000, '石原里美', 'CLERK', 7902, '1980-12-17', 800.00, NULL, 20, 1);-->
+<!--    </insert>-->
+
+<!--  连Oracle不能有分号  -->
+    <insert id="addEmp" parameterType="com.gsd.dao.EmpDao">
+<!--    OGNL表达式 #{get方法}，底层使用PreparedStatement接口，先生成？，再替换   -->
+        INSERT INTO emp VALUES (0, #{ename}, #{job}, #{mgr}, now(), #{sal}, #{comm}, #{deptno}, 1)
+    </insert>
+<!--insert delete update 标签可以混用-->
+    <update id="updateEmp" parameterType="com.gsd.dao.EmpDao">
+        update emp set ename=#{ename},job=#{job},mgr=#{mgr} WHERE empno=#{empno}
+    </update>
+
+    <!--insert delete update 标签可以混用-->
+    <select id="detail" resultType="com.gsd.dao.EmpDao">
+<!--        select * from emp WHERE empno=#{empno};-->
+        select empno,ename,job from emp WHERE empno=#{empno}
+    </select>
+
+    <select id="findAll" resultType="com.gsd.dao.EmpDao">
+        select empno,ename,job,mgr from emp
+    </select>
+</mapper>
