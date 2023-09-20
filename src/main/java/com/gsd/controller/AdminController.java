@@ -39,6 +39,7 @@ public class AdminController {
         Admin admin = adminService.login(username, password);
         System.out.println("用户B也提交");
         System.out.println("用户A修改Bug");
+        System.out.println("在Brach上提交");
         //失败的话已经被处理掉了,走到这里一定是成功了
         model.addAttribute("admin", admin);//也给Session保存一份
         return new Result("登录成功",admin);
