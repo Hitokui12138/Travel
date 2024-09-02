@@ -19,6 +19,9 @@ public class HotelPriceTest {
 
     @Test
     public void Test1(){
-        //hotelpriceDao.countByExample(new Hotelprice());
+        String[] arr = new String [5];
+        for (int i = 0; i < 5; i++) {
+            System.out.println(arr[i]);
+        }
     }
 }

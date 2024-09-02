@@ -1,13 +1,7 @@
 package test;
 
-import com.github.pagehelper.PageHelper;
+
 import com.gsd.dao.ScetypeDao;
-import com.gsd.entity.Scetype;
-import com.sun.tools.sjavac.comp.dependencies.PublicApiCollector;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;

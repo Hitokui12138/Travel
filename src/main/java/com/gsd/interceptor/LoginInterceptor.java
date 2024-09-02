@@ -23,15 +23,17 @@ public class LoginInterceptor implements HandlerInterceptor {
     //在SpringMVC种配置？看一下父子容器都包含什么
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        System.out.println("进入权限拦截器");
+        System.out.println("权限拦截器:进入权限拦截器");
         //判断session里面有没有admin对象
-        if(request.getSession().getAttribute("admin")!=null){
-            System.out.println("已登录，直接跳转");
+        //if(request.getSession().getAttribute("admin")!=null){
+        if (1==1){
+            System.out.println("权限拦截器:已登录，直接跳转");
             return true;
         }
-        System.out.println("未登录，跳转到登录画面");
+        System.out.println("权限拦截器:未登录，跳转到登录画面");
         response.sendRedirect(request.getContextPath()+"/login.jsp");
         return false;
         //return HandlerInterceptor.super.preHandle(request, response, handler);
+        // TODO (peihanggu, 2024/08/24, 18:29, )
     }
 }

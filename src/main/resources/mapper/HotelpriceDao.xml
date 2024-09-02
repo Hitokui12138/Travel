@@ -8,6 +8,7 @@
     <result column="roomcount" jdbcType="INTEGER" property="roomcount" />
     <result column="sum" jdbcType="INTEGER" property="sum" />
   </resultMap>
+
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">

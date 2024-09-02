@@ -17,11 +17,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 如果需要写入日志的话,
 和Operatelog二选一
  */
-//@ControllerAdvice
+@ControllerAdvice
 public class GlobalExceptionHandler {
     //从上往下匹配
     @ExceptionHandler(UserNameException.class)
     public String UserNameException(Exception e, Model model){
+        System.out.println("发生UserNameException");
         model.addAttribute("e", e.getMessage());
         return "index";//发生任何异常都跳转到这个页面
 
@@ -29,6 +30,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public String exception(Exception e, Model model){
+        System.out.println("发生通用异常");
         model.addAttribute("e", e.getMessage());
         return "500";//发生任何异常都跳转到这个页面,反正不能跳到自带的500错误页面
 

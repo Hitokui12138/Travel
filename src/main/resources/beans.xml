@@ -56,9 +56,9 @@
 
     <bean id="dataSource"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://localhost:3306/travle?serverTimezone=GMT&amp;useSSL=false"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/travel?serverTimezone=GMT&amp;useSSL=false"/>
         <property name="username" value="root"/>
-        <property name="password" value="admin"/>
+        <property name="password" value="Niuniu3268738.1"/>
     </bean>
 
     <!--  现在还缺一个sqlMapper，由于是Spring托管的，现在不能随便拿到了  -->

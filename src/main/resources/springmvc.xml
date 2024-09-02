@@ -17,6 +17,7 @@
     它会使用最新的处理器映射器,处理器适配器,开启5个转换器(包括日期)
       -->
     <mvc:annotation-driven/>
+
     <!--  视图解析器  -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/"/>

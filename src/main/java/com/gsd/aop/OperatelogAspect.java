@@ -55,6 +55,7 @@ public class OperatelogAspect {
          * method的父接口signature
          * 拿到一个Methodsignture,里面有需要的方法getmethod
          */
+        System.out.println("切面类,取得注解,将log保存到数据库中");
         MethodSignature signature = (MethodSignature)jp.getSignature();
         Method method = signature.getMethod();
 
@@ -68,6 +69,7 @@ public class OperatelogAspect {
         operatelog.setLogtype(annotation.logtype());
         operatelog.setRequestmethod(annotation.requestmethod());
         service.insert(operatelog);
+        System.out.println("切面类,正常log保存完毕");
     }
 
     //3. 异常通知(这是其中一种异常处理方法,spring)
@@ -88,12 +90,12 @@ public class OperatelogAspect {
     @AfterThrowing("execution(* com.gsd.controller.*.*(..))")
     public void AfterThrowing(JoinPoint jp){
         try {
-            System.out.println("切面类");
+            System.out.println("切面类,异常通知");
             //获取方法,log注解
             MethodSignature signature = (MethodSignature)jp.getSignature();
             Method method = signature.getMethod();
             com.gsd.annotation.OperateLog annotation = method.getAnnotation(OperateLog.class);
-
+            System.out.println(annotation);
 
             Exceptions exceptions = new Exceptions();
             exceptions.setId(0);
@@ -103,8 +105,8 @@ public class OperatelogAspect {
             exceptions.setIp(req.getRemoteAddr());
             exceptions.setUrl(req.getRequestURI());
 
-
             exceptionsService.insertSelective(exceptions);
+            System.out.println("切面类,异常保存完毕");
             //resp.sendRedirect("/500.jsp");只能拦截,不能跳转
         }catch(Exception e){
             e.printStackTrace();//重定向需要try catch

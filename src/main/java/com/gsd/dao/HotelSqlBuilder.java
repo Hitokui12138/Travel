@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 public class HotelSqlBuilder {
 
     public String builderFindAll(final Hotel hotel){
+        System.out.println("builderFindAll:执行查询");
         String sql = new SQL() {{   //两个大括号?
             SELECT("hotelid,hotelname,in_time,out_time,pic,hotelareaid,roomtypeid,context,collection,favorite,room_count,site,hotelphone,price");
             FROM("t_hotel");

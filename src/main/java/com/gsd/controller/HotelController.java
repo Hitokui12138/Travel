@@ -50,6 +50,7 @@ public class HotelController {
      * @return
      */
     @GetMapping("page")//跳转网页hotelAll.jsp
+    @OperateLog(operatemsg = "Hotel主页", logtype = "查询",requestmethod = "get")
     public String page(@RequestParam(name="curPage",required = false,defaultValue = "1")Integer curPage,
                        @RequestParam(name="pageSize",required = false,defaultValue = "5")Integer pageSize,
                        Model model,
